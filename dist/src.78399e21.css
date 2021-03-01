@@ -1,3 +1,36 @@
+.movie-poster {
+  height: 250px;
+  width: 100%;
+  cursor: pointer;
+}
+.movie-view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 300px;
+  font-family: sans-serif;
+}
+.login {
+  margin: 20px;
+  padding: 30px;
+}
+
+.header {
+  text-align: center;
+}
+.register {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.register #formBasicBirthday {
+  width: 250px;
+}
+.main-body {
+  padding: 20px;
+}
 .my-flix {
   color: steelblue;
 }

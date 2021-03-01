@@ -1,7 +1,12 @@
 import React from 'react';
-import MovieCard from '../movie-card/movie-card';
+import PropTypes from 'prop-types';
+
+import { Card, Button } from 'react-bootstrap';
+
+import './movie-view.scss';
 
 export class MovieView extends React.Component {
+
   constructor() {
     super();
 
@@ -13,30 +18,39 @@ export class MovieView extends React.Component {
 
     if (!movie) return null;
 
-    // if (this.state.initialState === '') return ;
-
     return (
       <div className='movie-view'>
-        <img className='movie-poster' src={movie.imagePath} />
-        <div className='movie-title'>
-          <span className='label'>Title: </span>
-          <span className='value'>{movie.title}</span>
-        </div>
-        <div className='movie-description'>
-          <span className='label'>Description: </span>
-          <span className='value'>{movie.Description}</span>
-        </div>
-
-        <div className='movie-genre'>
-          <span className='label'>Genre: </span>
-          <span className='value'>{movie.genre.name}</span>
-        </div>
-        <div className='movie-director'>
-          <span className='label'>Director: </span>
-          <span className='value'>{movie.Director.name}</span>
-        </div>
-        <button onClick={() => onClick()}>Back</button>
+        <Card>
+          <Card.Img className='movie-poster' variant="top" src={movie.imagePath} />
+          <Card.Title className='label-title'>{movie.title}</Card.Title>
+          <Card.Body>
+            <Card.Text className='label-body'>{movie.Description}</Card.Text>
+            <Card.Text className='label-body'>Director: {movie.Director.name}</Card.Text>
+            <Card.Text className='label-body'>Genre: {movie.genre.name}</Card.Text>
+          </Card.Body>
+          <Button className='return-button' variant='dark' onClick={() => onClick(movie)}>Return to Movie List</Button>
+        </Card>
       </div>
     );
   }
 }
+
+MovieView.propTypes = {
+  // shape({...}) means it expects an object
+  movie: PropTypes.shape({
+    // movie prop may contain Title, and IF it does, it must be a string
+    title: PropTypes.string.isRequired,
+    Description: PropTypes.string.isRequired,
+    imagePath: PropTypes.string.isRequired,
+    genre: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      description: PropTypes.string.isRequired
+    }),
+    Director: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      age: PropTypes.number.isRequired
+    }),
+  }).isRequired,
+  // props object must contain onClick and it MUST be a function
+  onClick: PropTypes.func.isRequired
+};
