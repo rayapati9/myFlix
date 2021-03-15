@@ -148,7 +148,9 @@ export class MainView extends React.Component {
       return (
         <RegistrationView
           onRegister={(register) => this.onRegister(register)}
-          onLoggedIn={(user) => this.onLoggedIn(user)}
+          onLoggedIn={(user) => {
+            this.onLoggedIn(user)
+          }}
         />
       );
 
@@ -193,6 +195,7 @@ export class MainView extends React.Component {
                     src={logo}
                     className='d-inline-block align-top'
                     alt='React Bootstrap logo'
+                    height="50"
                   />
                 </Link>
               </Navbar.Brand>

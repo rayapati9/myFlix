@@ -19,12 +19,11 @@ export class MovieView extends React.Component {
 
     const handleSubmit = (e) => {
       e.preventDefault();
-      let checkMovieExistLS = [];
-      //checkMovieExistLS = JSON.parse(localStorage.getItem('favoriteMovies'));
-      //if (checkMovieExistLS.includes(movie._id)) {
-      // alert('Movie already added on favorite list');
-      //return;
-      //}
+      const checkMovieExistLS = localStorage.getItem('favoriteMovies').split(',')
+      if (checkMovieExistLS.includes(movie._id)) {
+        alert('Movie already added on favorite list');
+        return;
+      }
       let token = localStorage.getItem('token');
       axios
         .post(
@@ -33,9 +32,10 @@ export class MovieView extends React.Component {
         .then((response) => {
           console.log(response);
           checkMovieExistLS.push(movie._id);
+          const list = checkMovieExistLS.join(',')
           localStorage.setItem(
             'favoriteMovies',
-            JSON.stringify(checkMovieExistLS)
+            list
           );
           alert('Movie successfully added to favorite');
         })

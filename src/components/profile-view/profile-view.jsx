@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { BrowserRouter as Router, Link } from "react-router-dom";
 
 import { Form, Button, InputGroup, FormControl, Card } from 'react-bootstrap';
 
@@ -7,22 +8,21 @@ import './profile-view.scss';
 import axios from 'axios';
 
 export function ProfileView(props) {
-  let favoriteMovies = [];
-  favoriteMovies = JSON.parse(localStorage.getItem('favoriteMovies'));
+  const favoriteMovies = localStorage.getItem('favoriteMovies').split(',');
+
   const [user, setUsername] = useState(props.user);
   const [email, setEmail] = useState(props.email);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [birthday, setBirthday] = useState(props.birthday);
-  const [favoriteMoviesUpdate, setFavoriteMoviesUpdate] = useState(
-    favoriteMovies
-  );
+  const [favoriteMoviesUpdate, setFavoriteMoviesUpdate] = useState(favoriteMovies)
 
   const [usernameErr, setUsernameErr] = useState({});
   const [emailErr, setEmailErr] = useState({});
   const [passwordErr, setPasswordErr] = useState({});
   const [confirmPasswordErr, setConfirmPasswordErr] = useState({});
   const [birthdayErr, setBirthdayErr] = useState({});
+
 
   let convertDate = new Date(birthday).toISOString().slice(0, 10);
 
@@ -72,21 +72,31 @@ export function ProfileView(props) {
     }
   };
 
+  function removeItemOnce(arr, value) {
+    var index = arr.indexOf(value);
+    if (index > -1) {
+      arr.splice(index, 1);
+    }
+    return arr;
+  }
+
   const handleRemoveMovie = (movie) => {
-    let updateMovieList = [];
-    updateMovieList = JSON.parse(localStorage.getItem('favoriteMovies'));
     if (confirm(`Are you sure you want to remove this ${movie}?`)) {
       axios
         .delete(
-          `https://telugumovies99.herokuapp.com/users/${props.user}/movies/${movie._id}`
+          `https://telugumovies99.herokuapp.com/users/${props.user}/movies/${movie}`
         )
-        .then(() => {
-          updateMovieList.pop(movie);
-          localStorage.setItem(
+        .then(result => {
+          const index = favoriteMoviesUpdate.indexOf(movie)
+          if (index != -1) {
+            favoriteMoviesUpdate.splice(index, 1)
+            setFavoriteMoviesUpdate([...favoriteMoviesUpdate])
+            localStorage.setItem('favoriteMovies', favoriteMoviesUpdate.join(','))
+          }
+          /*localStorage.setItem(
             'favoriteMovies',
-            JSON.stringify(updateMovieList)
-          );
-          setFavoriteMoviesUpdate(updateMovieList);
+            updateMovieList
+          ); */
         })
         .catch((e) => {
           console.log(e);
@@ -183,9 +193,9 @@ export function ProfileView(props) {
         <div className='favorite-movies text-center'>
           <Card>
             Favorite Movies
-            {favoriteMoviesUpdate.map((movie) => {
+            {favoriteMoviesUpdate.map((movie, index) => {
             return (
-              <InputGroup className='mb-3'>
+              <InputGroup className='mb-3' key={index}>
                 <FormControl
                   placeholder={movie}
                   aria-label='Favorite Movies'

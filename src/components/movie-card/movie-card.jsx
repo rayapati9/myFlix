@@ -34,14 +34,14 @@ MovieCard.propTypes = {
   movie: PropTypes.shape({
     title: PropTypes.string.isRequired,
     Description: PropTypes.string.isRequired,
-    imagePath: PropTypes.string.isRequired,
+    imagePath: PropTypes.array,
     genre: PropTypes.shape({
       name: PropTypes.string.isRequired,
       Description: PropTypes.string.isRequired,
     }),
     Director: PropTypes.shape({
       name: PropTypes.string.isRequired,
-      age: PropTypes.string.isRequired,
+      age: PropTypes.number.isRequired,
     }),
   }).isRequired,
 };
