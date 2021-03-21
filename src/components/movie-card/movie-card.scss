@@ -1,5 +1,10 @@
+.movie-cards {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .movie-poster {
   height: 250px;
-  width: 100%;
+  width: 250px;
   cursor: pointer;
 }
