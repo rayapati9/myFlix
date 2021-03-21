@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+
 import {
   Navbar,
   Nav,
@@ -11,10 +12,16 @@ import {
   Col,
   Jumbotron,
 } from 'react-bootstrap';
-// import { FaSearch } from 'react-icons/fa';
+
+import { connect } from 'react-redux';
+
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
+
+import { setMovies } from '../../actions/actions';
+
+import MoviesList from '../movies-list/movies-list';
 import { RegistrationView } from '../registration-view/registration-view';
 import { ProfileView } from '../profile-view/profile-view';
 import { GenreView } from '../genre-view/genre-view';
@@ -23,12 +30,13 @@ import { LoginView } from '../login-view/login-view';
 import { MovieCard } from '../movie-card/movie-card';
 import { MovieView } from '../movie-view/movie-view';
 import logo from '../../../public/images/logo.png';
+import VisibilityFilterInput from "../visibility-filter-input/visibility-filter-input.jsx";
 import './main-view.scss';
 
-export class MainView extends React.Component {
+
+class MainView extends React.Component {
+
   constructor() {
-    // Call the superclass constructor
-    // so React can initialize it
     super();
 
     // Initialize the state to an empty object so we can destructure it later
@@ -56,6 +64,20 @@ export class MainView extends React.Component {
       });
       this.getMovies(accessToken);
     }
+  }
+
+  getMovies(token) {
+    axios.get('https://telugumovies99.herokuapp.com/movies', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(response => {
+
+        // #1
+        this.props.setMovies(response.data);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   }
 
   /*When a movie is clicked, this function is invoked and updates the state of the `selectedMovie` *property to that movie*/
@@ -120,28 +142,14 @@ export class MainView extends React.Component {
     });
   }
 
-  // Get movies in saved in heroku
-  getMovies(token) {
-    axios
-      .get('https://telugumovies99.herokuapp.com/movies', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        this.setState({
-          movies: response.data,
-        });
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }
 
-  // This overrides the render() method of the superclass
-  // No need to call super() though, as it does nothing by default
   render() {
-    // If the state isn't initialized, this will throw on runtime
-    // before the data is initially loaded
-    const { movies, register, user, profile } = this.state;
+
+    // #2
+    let { movies, visibilityFilter } = this.props;
+    let { user } = this.state;
+    let { register } = this.state;
+    let { profile } = this.state;
 
     // Before the movies have been loaded
     if (!register)
@@ -180,7 +188,7 @@ export class MainView extends React.Component {
 
     return (
       <Router>
-        <div className='main-view'>
+        <div className="main-view">
           <header>
             <Navbar
               collapseOnSelect
@@ -221,6 +229,14 @@ export class MainView extends React.Component {
                     </InputGroup.Append>
                   </InputGroup>
                </Form>*/}
+                <Form inline>
+
+                  <VisibilityFilterInput
+                    className="mr-sm-2"
+                    visibilityFilter={visibilityFilter}
+                  />
+                </Form>
+
               </Navbar.Collapse>
             </Navbar>
           </header>
@@ -228,29 +244,14 @@ export class MainView extends React.Component {
           <div className='main-body text-center'>
             <Container>
               <Row>
-                <Route
-                  exact
-                  path='/'
-                  render={() =>
-                    movies.map((m) => (
-                      <Col xs={12} md={3} key={m._id} className='p-2'>
-                        <MovieCard key={m._id} movie={m} />
-                      </Col>
-                    ))
-                  }
-                />
+                <Route exact path="/" render={() => {
+                  if (!user) return <LoginView onLoggedIn={user => this.onLoggedIn(user)} />;
+                  return <MoviesList movies={movies} />;
+                }} />
               </Row>
             </Container>
-            <Route
-              path='/movies/:movieId'
-              render={({ match }) => (
-                <MovieView
-                  movie={movies.find((m) => m._id === match.params.movieId)}
-                  user={this.state.user}
-                />
-              )}
-            />
-
+            <Route path="/register" render={() => <RegistrationView />} />
+            <Route path="/movies/:movieId" render={({ match }) => <MovieView movie={movies.find(m => m._id === match.params.movieId)} />} />
             <Route
               exact
               path='/movies/genre/:genre'
@@ -262,7 +263,6 @@ export class MainView extends React.Component {
                 />
               )}
             />
-
             <Container>
               <Row>
                 <Route
@@ -326,8 +326,17 @@ export class MainView extends React.Component {
           <footer className='fixed-bottom bg-dark text-white text-center'>
             <p>Coyright &#169; 2020 myFlix. All rights reserved</p>
           </footer>
+
         </div>
       </Router>
     );
   }
 }
+
+// #3
+let mapStateToProps = state => {
+  return { movies: state.movies }
+}
+
+// #4
+export default connect(mapStateToProps, { setMovies })(MainView);
