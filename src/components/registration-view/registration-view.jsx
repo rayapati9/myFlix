@@ -25,6 +25,18 @@ export function RegistrationView(props) {
       formValidation();
       return;
     }
+    if (email === '') {
+      formValidation();
+      return;
+    }
+    if (username === '') {
+      formValidation();
+      return;
+    }
+    if (password !== confirmPassword) {
+      formValidation();
+      return;
+    }
     axios
       .post('https://telugumovies99.herokuapp.com/users', {
         username,
