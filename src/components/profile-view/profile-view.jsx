@@ -25,10 +25,23 @@ export function ProfileView(props) {
 
 
   let convertDate = new Date(birthday).toISOString().slice(0, 10);
+  let token = localStorage.getItem('token');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (birthday === '') {
+      formValidation();
+      return;
+    }
+    if (email === '') {
+      formValidation();
+      return;
+    }
+    if (user === '') {
+      formValidation();
+      return;
+    }
+    if (password !== confirmPassword) {
       formValidation();
       return;
     }
@@ -38,13 +51,18 @@ export function ProfileView(props) {
         password: password,
         email: email,
         birthday: birthday,
-      })
+      },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      )
       .then(() => {
         localStorage.removeItem('user', 'email', 'birthday');
         localStorage.setItem('user', user);
         localStorage.setItem('email', email);
         localStorage.setItem('birthday', birthday);
         props.onProfile('profile');
+        alert("your profile successfully updated");
       })
       .catch(() => {
         console.log('Error updating user');
@@ -61,7 +79,11 @@ export function ProfileView(props) {
     e.preventDefault();
     if (confirm('Are you sure you want to unregister?')) {
       axios
-        .delete(`https://telugumovies99.herokuapp.com/users/${props.user}`)
+        .delete(`https://telugumovies99.herokuapp.com/users/${props.user}`,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        )
         .then(() => {
           localStorage.clear();
           props.onUnregister(null);
